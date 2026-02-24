@@ -2,153 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Geometry Dash Mini</title>
+<title>Snake Game</title>
 <style>
-    body { 
+    body {
         margin: 0;
-        overflow: hidden;
-        background: #111;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #111;
     }
     canvas {
-        display: block;
-        margin: auto;
-        background: linear-gradient(#1e1e2f, #111);
+        background-color: #222;
     }
 </style>
 </head>
 <body>
-
-<canvas id="gameCanvas"></canvas>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
 
 <script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = 400;
-
-let gravity = 0.8;
-let jumpForce = -15;
-let ground = canvas.height - 60;
-let gameSpeed = 6;
-let score = 0;
-let gameOver = false;
-
-const player = {
-    x: 150,
-    y: ground,
-    width: 40,
-    height: 40,
-    dy: 0,
-    jumping: false
-};
-
-const obstacles = [];
-
-function spawnObstacle() {
-    obstacles.push({
-        x: canvas.width,
-        y: ground,
-        width: 40,
-        height: 40
-    });
-}
-
-setInterval(spawnObstacle, 1500);
-
-function drawPlayer() {
-    ctx.fillStyle = "#00ffff";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-}
-
-function drawGround() {
-    ctx.fillStyle = "#00ff99";
-    ctx.fillRect(0, ground + player.height, canvas.width, 10);
-}
-
-function drawObstacles() {
-    ctx.fillStyle = "#ff0055";
-    obstacles.forEach(ob => {
-        ctx.beginPath();
-        ctx.moveTo(ob.x, ob.y + ob.height);
-        ctx.lineTo(ob.x + ob.width / 2, ob.y);
-        ctx.lineTo(ob.x + ob.width, ob.y + ob.height);
-        ctx.closePath();
-        ctx.fill();
-    });
-}
-
-function updateObstacles() {
-    obstacles.forEach(ob => {
-        ob.x -= gameSpeed;
-    });
-}
-
-function checkCollision() {
-    for (let ob of obstacles) {
-        if (
-            player.x < ob.x + ob.width &&
-            player.x + player.width > ob.x &&
-            player.y < ob.y + ob.height &&
-            player.y + player.height > ob.y
-        ) {
-            gameOver = true;
-        }
-    }
-}
-
-function update() {
-    if (gameOver) {
-        ctx.fillStyle = "white";
-        ctx.font = "50px Arial";
-        ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
-        return;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    player.dy += gravity;
-    player.y += player.dy;
-
-    if (player.y > ground) {
-        player.y = ground;
-        player.dy = 0;
-        player.jumping = false;
-    }
-
-    updateObstacles();
-    checkCollision();
-
-    score++;
-    
-    drawGround();
-    drawPlayer();
-    drawObstacles();
-
-    ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
-    ctx.fillText("Score: " + score, 20, 30);
-
-    requestAnimationFrame(update);
-}
-
-function jump() {
-    if (!player.jumping) {
-        player.dy = jumpForce;
-        player.jumping = true;
-    }
-}
-
-document.addEventListener("keydown", e => {
-    if (e.code === "Space") {
-        jump();
-    }
-});
-
-document.addEventListener("click", jump);
-
-update();
-</script>
-
-</body>
-</html>
